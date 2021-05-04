@@ -3,6 +3,8 @@ package bsu.rfe.java.group9.lab7.Kutsis;
 import javax.swing.*;
 import java.awt.*;
 import java.io.DataInputStream;
+import javax.jms.*;
+import java.util.ArrayList;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -14,6 +16,15 @@ import java.net.UnknownHostException;
 public class InstantMessenger extends Component {
     private static final int SERVER_PORT = 4567;
     private String sender;
+    private ArrayList<MessageListener> listeners = new ArrayList<MessageListener>();
+
+    private void notifyListeners(String sender, String message) {
+        synchronized (listeners) {
+            for (MessageListener listener : listeners) {
+                listener.messageReceived(sender, message);
+            }
+        }
+    }
 
     public static int getServerPort() {
         return SERVER_PORT;
@@ -64,9 +75,10 @@ public class InstantMessenger extends Component {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
+
+
+
     private void startServer(JTextArea textAreaIncoming){
         new Thread(new Runnable() {
             @Override
@@ -104,7 +116,10 @@ public class InstantMessenger extends Component {
             }
         }).start();
     }
+
+
     }
+
 
 
 
